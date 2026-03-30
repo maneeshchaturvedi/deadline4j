@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdaptiveTimeoutConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">AdaptiveTimeoutConfig.java</span></div><h1>AdaptiveTimeoutConfig.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+import java.time.Duration;
+
+/**
+ * Configuration for {@link AdaptiveTimeout}. Immutable.
+ *
+ * &lt;p&gt;All duration fields are clamped to absolute safety bounds:
+ * [{@value #ABSOLUTE_MIN_MS}ms, {@value #ABSOLUTE_MAX_MS}ms].
+ * These bounds are hardcoded and cannot be overridden by configuration.
+ */
+public final class AdaptiveTimeoutConfig {
+
+    // Absolute safety bounds. Cannot be overridden by configuration.
+    private static final long ABSOLUTE_MIN_MS = 1;
+    private static final long ABSOLUTE_MAX_MS = 300_000; // 5 minutes
+<span class="fc" id="L17">    private static final Duration ABSOLUTE_MIN = Duration.ofMillis(ABSOLUTE_MIN_MS);</span>
+<span class="fc" id="L18">    private static final Duration ABSOLUTE_MAX = Duration.ofMinutes(5);</span>
+
+    private final double percentile;
+    private final Duration minTimeout;
+    private final Duration maxTimeout;
+    private final Duration coldStartTimeout;
+    private final int minSamples;
+    private final Duration windowSize;
+    private final double headroomMultiplier;
+
+<span class="fc" id="L28">    private AdaptiveTimeoutConfig(Builder b) {</span>
+<span class="fc" id="L29">        this.percentile = Math.max(0.0, Math.min(1.0, b.percentile));</span>
+<span class="fc" id="L30">        this.minTimeout = clamp(b.minTimeout, ABSOLUTE_MIN, ABSOLUTE_MAX);</span>
+<span class="fc" id="L31">        this.maxTimeout = clamp(b.maxTimeout, ABSOLUTE_MIN, ABSOLUTE_MAX);</span>
+<span class="fc" id="L32">        this.coldStartTimeout = clamp(b.coldStartTimeout, ABSOLUTE_MIN, ABSOLUTE_MAX);</span>
+<span class="fc" id="L33">        this.minSamples = Math.max(1, b.minSamples);</span>
+<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        this.windowSize = b.windowSize.isNegative() || b.windowSize.isZero()</span>
+<span class="pc" id="L35">                ? Duration.ofSeconds(60) : b.windowSize;</span>
+<span class="fc" id="L36">        this.headroomMultiplier = Math.max(1.0, b.headroomMultiplier);</span>
+<span class="fc" id="L37">    }</span>
+
+    private static Duration clamp(Duration value, Duration min, Duration max) {
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (value.compareTo(min) &lt; 0) return min;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (value.compareTo(max) &gt; 0) return max;</span>
+<span class="fc" id="L42">        return value;</span>
+    }
+
+    /** Percentile of observed latencies to use for timeout computation. */
+<span class="fc" id="L46">    public double percentile() { return percentile; }</span>
+
+    /** Minimum timeout floor. */
+<span class="fc" id="L49">    public Duration minTimeout() { return minTimeout; }</span>
+
+    /** Maximum timeout ceiling. */
+<span class="fc" id="L52">    public Duration maxTimeout() { return maxTimeout; }</span>
+
+    /** Timeout used during cold start (before enough samples collected). */
+<span class="fc" id="L55">    public Duration coldStartTimeout() { return coldStartTimeout; }</span>
+
+    /** Minimum number of samples before switching from cold start to adaptive. */
+<span class="fc" id="L58">    public int minSamples() { return minSamples; }</span>
+
+    /** Sliding window duration for the histogram. */
+<span class="fc" id="L61">    public Duration windowSize() { return windowSize; }</span>
+
+    /** Multiplier applied to the percentile value to provide headroom. */
+<span class="fc" id="L64">    public double headroomMultiplier() { return headroomMultiplier; }</span>
+
+    /** Create a new builder with default values. */
+<span class="fc" id="L67">    public static Builder builder() { return new Builder(); }</span>
+
+    /**
+     * Builder for {@link AdaptiveTimeoutConfig}.
+     */
+    public static final class Builder {
+<span class="fc" id="L73">        private double percentile = 0.99;</span>
+<span class="fc" id="L74">        private Duration minTimeout = Duration.ofMillis(50);</span>
+<span class="fc" id="L75">        private Duration maxTimeout = Duration.ofSeconds(30);</span>
+<span class="fc" id="L76">        private Duration coldStartTimeout = Duration.ofSeconds(5);</span>
+<span class="fc" id="L77">        private int minSamples = 100;</span>
+<span class="fc" id="L78">        private Duration windowSize = Duration.ofSeconds(60);</span>
+<span class="fc" id="L79">        private double headroomMultiplier = 1.5;</span>
+
+<span class="fc" id="L81">        Builder() {}</span>
+
+<span class="fc" id="L83">        public Builder percentile(double v) { this.percentile = v; return this; }</span>
+<span class="fc" id="L84">        public Builder minTimeout(Duration v) { this.minTimeout = v; return this; }</span>
+<span class="fc" id="L85">        public Builder maxTimeout(Duration v) { this.maxTimeout = v; return this; }</span>
+<span class="fc" id="L86">        public Builder coldStartTimeout(Duration v) { this.coldStartTimeout = v; return this; }</span>
+<span class="fc" id="L87">        public Builder minSamples(int v) { this.minSamples = v; return this; }</span>
+<span class="fc" id="L88">        public Builder windowSize(Duration v) { this.windowSize = v; return this; }</span>
+<span class="fc" id="L89">        public Builder headroomMultiplier(double v) { this.headroomMultiplier = v; return this; }</span>
+<span class="fc" id="L90">        public AdaptiveTimeoutConfig build() { return new AdaptiveTimeoutConfig(this); }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

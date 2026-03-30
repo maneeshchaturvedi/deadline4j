@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Deadline4jAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-spring-boot-starter</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.spring.autoconfigure</a> &gt; <span class="el_source">Deadline4jAutoConfiguration.java</span></div><h1>Deadline4jAutoConfiguration.java</h1><pre class="source lang-java linenums">package io.deadline4j.spring.autoconfigure;
+
+import io.deadline4j.AdaptiveTimeoutRegistry;
+import io.deadline4j.DeadlineCodec;
+import io.deadline4j.DeadlineTimer;
+import io.deadline4j.ServerDeadlineConfig;
+import io.deadline4j.ServiceConfig;
+import io.deadline4j.ServiceConfigRegistry;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+
+/**
+ * Spring Boot auto-configuration for deadline4j core beans.
+ *
+ * &lt;p&gt;Registers shared infrastructure beans ({@link DeadlineCodec},
+ * {@link AdaptiveTimeoutRegistry}, {@link ServiceConfigRegistry},
+ * {@link ServerDeadlineConfig}, {@link DeadlineTimer}) that are
+ * consumed by the web-framework-specific configurations.
+ *
+ * &lt;p&gt;All beans are conditional on missing bean, so applications can
+ * provide their own implementations.
+ */
+@AutoConfiguration
+@EnableConfigurationProperties(Deadline4jProperties.class)
+<span class="fc" id="L27">public class Deadline4jAutoConfiguration {</span>
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DeadlineCodec deadlineCodec() {
+<span class="fc" id="L32">        return DeadlineCodec.remainingMillis();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AdaptiveTimeoutRegistry adaptiveTimeoutRegistry(Deadline4jProperties props) {
+<span class="fc" id="L38">        return new AdaptiveTimeoutRegistry(serviceName -&gt; {</span>
+<span class="fc" id="L39">            Deadline4jProperties.ServiceProperties svc = props.getServices().get(serviceName);</span>
+            Deadline4jProperties.AdaptiveDefaults adaptive =
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">                    (svc != null &amp;&amp; svc.getAdaptive() != null)</span>
+<span class="fc" id="L42">                            ? svc.getAdaptive()</span>
+<span class="fc" id="L43">                            : props.getAdaptive();</span>
+<span class="fc" id="L44">            return adaptive.toConfig();</span>
+        });
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ServiceConfigRegistry serviceConfigRegistry(Deadline4jProperties props) {
+<span class="fc" id="L51">        return new ServiceConfigRegistry(serviceName -&gt; {</span>
+<span class="fc" id="L52">            Deadline4jProperties.ServiceProperties svc = props.getServices().get(serviceName);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (svc == null) {</span>
+<span class="fc" id="L54">                return ServiceConfig.builder()</span>
+<span class="fc" id="L55">                        .enforcement(props.getEnforcement())</span>
+<span class="fc" id="L56">                        .build();</span>
+            }
+<span class="fc" id="L58">            return ServiceConfig.builder()</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">                    .enforcement(svc.getEnforcement() != null</span>
+<span class="fc" id="L60">                            ? svc.getEnforcement()</span>
+<span class="nc" id="L61">                            : props.getEnforcement())</span>
+<span class="fc" id="L62">                    .priority(svc.getPriority())</span>
+<span class="fc" id="L63">                    .minBudgetRequired(svc.getMinBudgetRequired())</span>
+<span class="fc" id="L64">                    .maxDeadline(svc.getMaxDeadline())</span>
+<span class="fc" id="L65">                    .build();</span>
+        });
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ServerDeadlineConfig serverDeadlineConfig(Deadline4jProperties props) {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        return props.getServerMaxDeadline() != null</span>
+<span class="fc" id="L73">                ? new ServerDeadlineConfig(props.getServerMaxDeadline())</span>
+<span class="fc" id="L74">                : ServerDeadlineConfig.none();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DeadlineTimer deadlineTimer() {
+<span class="fc" id="L80">        return DeadlineTimer.defaultTimer();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

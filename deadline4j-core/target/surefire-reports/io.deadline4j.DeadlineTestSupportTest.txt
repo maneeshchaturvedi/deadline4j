@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.deadline4j.DeadlineTestSupportTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.221 s -- in io.deadline4j.DeadlineTestSupportTest

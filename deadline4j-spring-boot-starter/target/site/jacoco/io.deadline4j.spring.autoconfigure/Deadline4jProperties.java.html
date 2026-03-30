@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Deadline4jProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-spring-boot-starter</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.spring.autoconfigure</a> &gt; <span class="el_source">Deadline4jProperties.java</span></div><h1>Deadline4jProperties.java</h1><pre class="source lang-java linenums">package io.deadline4j.spring.autoconfigure;
+
+import io.deadline4j.AdaptiveTimeoutConfig;
+import io.deadline4j.EnforcementMode;
+import io.deadline4j.ServicePriority;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Spring Boot configuration properties for deadline4j, bound to the
+ * {@code deadline4j.*} namespace.
+ */
+@ConfigurationProperties(prefix = &quot;deadline4j&quot;)
+<span class="fc" id="L17">public class Deadline4jProperties {</span>
+
+    /** Master enforcement switch. Default: OBSERVE (safe). */
+<span class="fc" id="L20">    private EnforcementMode enforcement = EnforcementMode.OBSERVE;</span>
+
+    /** Default deadline for requests arriving without X-Deadline-Remaining-Ms. */
+    private Duration defaultDeadline;
+
+    /** Server-imposed maximum deadline ceiling. */
+    private Duration serverMaxDeadline;
+
+    /** Global adaptive timeout defaults. */
+<span class="fc" id="L29">    private AdaptiveDefaults adaptive = new AdaptiveDefaults();</span>
+
+    /** Per-service overrides keyed by service name. */
+<span class="fc" id="L32">    private Map&lt;String, ServiceProperties&gt; services = new LinkedHashMap&lt;&gt;();</span>
+
+    public EnforcementMode getEnforcement() {
+<span class="fc" id="L35">        return enforcement;</span>
+    }
+
+    public void setEnforcement(EnforcementMode enforcement) {
+<span class="fc" id="L39">        this.enforcement = enforcement;</span>
+<span class="fc" id="L40">    }</span>
+
+    public Duration getDefaultDeadline() {
+<span class="fc" id="L43">        return defaultDeadline;</span>
+    }
+
+    public void setDefaultDeadline(Duration defaultDeadline) {
+<span class="fc" id="L47">        this.defaultDeadline = defaultDeadline;</span>
+<span class="fc" id="L48">    }</span>
+
+    public Duration getServerMaxDeadline() {
+<span class="fc" id="L51">        return serverMaxDeadline;</span>
+    }
+
+    public void setServerMaxDeadline(Duration serverMaxDeadline) {
+<span class="fc" id="L55">        this.serverMaxDeadline = serverMaxDeadline;</span>
+<span class="fc" id="L56">    }</span>
+
+    public AdaptiveDefaults getAdaptive() {
+<span class="fc" id="L59">        return adaptive;</span>
+    }
+
+    public void setAdaptive(AdaptiveDefaults adaptive) {
+<span class="fc" id="L63">        this.adaptive = adaptive;</span>
+<span class="fc" id="L64">    }</span>
+
+    public Map&lt;String, ServiceProperties&gt; getServices() {
+<span class="fc" id="L67">        return services;</span>
+    }
+
+    public void setServices(Map&lt;String, ServiceProperties&gt; services) {
+<span class="fc" id="L71">        this.services = services;</span>
+<span class="fc" id="L72">    }</span>
+
+    /**
+     * Adaptive timeout defaults that map to {@link AdaptiveTimeoutConfig}.
+     */
+<span class="fc" id="L77">    public static class AdaptiveDefaults {</span>
+
+<span class="fc" id="L79">        private double percentile = 0.99;</span>
+<span class="fc" id="L80">        private Duration minTimeout = Duration.ofMillis(50);</span>
+<span class="fc" id="L81">        private Duration maxTimeout = Duration.ofSeconds(30);</span>
+<span class="fc" id="L82">        private Duration coldStartTimeout = Duration.ofSeconds(5);</span>
+<span class="fc" id="L83">        private int minSamples = 100;</span>
+<span class="fc" id="L84">        private Duration windowSize = Duration.ofSeconds(60);</span>
+<span class="fc" id="L85">        private double headroomMultiplier = 1.5;</span>
+
+        public double getPercentile() {
+<span class="fc" id="L88">            return percentile;</span>
+        }
+
+        public void setPercentile(double percentile) {
+<span class="fc" id="L92">            this.percentile = percentile;</span>
+<span class="fc" id="L93">        }</span>
+
+        public Duration getMinTimeout() {
+<span class="fc" id="L96">            return minTimeout;</span>
+        }
+
+        public void setMinTimeout(Duration minTimeout) {
+<span class="fc" id="L100">            this.minTimeout = minTimeout;</span>
+<span class="fc" id="L101">        }</span>
+
+        public Duration getMaxTimeout() {
+<span class="fc" id="L104">            return maxTimeout;</span>
+        }
+
+        public void setMaxTimeout(Duration maxTimeout) {
+<span class="fc" id="L108">            this.maxTimeout = maxTimeout;</span>
+<span class="fc" id="L109">        }</span>
+
+        public Duration getColdStartTimeout() {
+<span class="fc" id="L112">            return coldStartTimeout;</span>
+        }
+
+        public void setColdStartTimeout(Duration coldStartTimeout) {
+<span class="fc" id="L116">            this.coldStartTimeout = coldStartTimeout;</span>
+<span class="fc" id="L117">        }</span>
+
+        public int getMinSamples() {
+<span class="fc" id="L120">            return minSamples;</span>
+        }
+
+        public void setMinSamples(int minSamples) {
+<span class="fc" id="L124">            this.minSamples = minSamples;</span>
+<span class="fc" id="L125">        }</span>
+
+        public Duration getWindowSize() {
+<span class="fc" id="L128">            return windowSize;</span>
+        }
+
+        public void setWindowSize(Duration windowSize) {
+<span class="fc" id="L132">            this.windowSize = windowSize;</span>
+<span class="fc" id="L133">        }</span>
+
+        public double getHeadroomMultiplier() {
+<span class="fc" id="L136">            return headroomMultiplier;</span>
+        }
+
+        public void setHeadroomMultiplier(double headroomMultiplier) {
+<span class="fc" id="L140">            this.headroomMultiplier = headroomMultiplier;</span>
+<span class="fc" id="L141">        }</span>
+
+        /** Convert to core {@link AdaptiveTimeoutConfig}. */
+        public AdaptiveTimeoutConfig toConfig() {
+<span class="fc" id="L145">            return AdaptiveTimeoutConfig.builder()</span>
+<span class="fc" id="L146">                    .percentile(percentile)</span>
+<span class="fc" id="L147">                    .minTimeout(minTimeout)</span>
+<span class="fc" id="L148">                    .maxTimeout(maxTimeout)</span>
+<span class="fc" id="L149">                    .coldStartTimeout(coldStartTimeout)</span>
+<span class="fc" id="L150">                    .minSamples(minSamples)</span>
+<span class="fc" id="L151">                    .windowSize(windowSize)</span>
+<span class="fc" id="L152">                    .headroomMultiplier(headroomMultiplier)</span>
+<span class="fc" id="L153">                    .build();</span>
+        }
+    }
+
+    /**
+     * Per-service configuration overrides.
+     */
+<span class="fc" id="L160">    public static class ServiceProperties {</span>
+
+        /** Per-service enforcement. Null = inherit global. */
+        private EnforcementMode enforcement;
+
+<span class="fc" id="L165">        private ServicePriority priority = ServicePriority.REQUIRED;</span>
+
+        private Duration minBudgetRequired;
+
+        private Duration maxDeadline;
+
+        /** Per-service adaptive overrides. Null = inherit global. */
+        private AdaptiveDefaults adaptive;
+
+        public EnforcementMode getEnforcement() {
+<span class="fc" id="L175">            return enforcement;</span>
+        }
+
+        public void setEnforcement(EnforcementMode enforcement) {
+<span class="fc" id="L179">            this.enforcement = enforcement;</span>
+<span class="fc" id="L180">        }</span>
+
+        public ServicePriority getPriority() {
+<span class="fc" id="L183">            return priority;</span>
+        }
+
+        public void setPriority(ServicePriority priority) {
+<span class="fc" id="L187">            this.priority = priority;</span>
+<span class="fc" id="L188">        }</span>
+
+        public Duration getMinBudgetRequired() {
+<span class="fc" id="L191">            return minBudgetRequired;</span>
+        }
+
+        public void setMinBudgetRequired(Duration minBudgetRequired) {
+<span class="fc" id="L195">            this.minBudgetRequired = minBudgetRequired;</span>
+<span class="fc" id="L196">        }</span>
+
+        public Duration getMaxDeadline() {
+<span class="fc" id="L199">            return maxDeadline;</span>
+        }
+
+        public void setMaxDeadline(Duration maxDeadline) {
+<span class="fc" id="L203">            this.maxDeadline = maxDeadline;</span>
+<span class="fc" id="L204">        }</span>
+
+        public AdaptiveDefaults getAdaptive() {
+<span class="fc" id="L207">            return adaptive;</span>
+        }
+
+        public void setAdaptive(AdaptiveDefaults adaptive) {
+<span class="fc" id="L211">            this.adaptive = adaptive;</span>
+<span class="fc" id="L212">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

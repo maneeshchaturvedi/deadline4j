@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeadlineTextMapPropagator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-opentelemetry</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.opentelemetry</a> &gt; <span class="el_source">DeadlineTextMapPropagator.java</span></div><h1>DeadlineTextMapPropagator.java</h1><pre class="source lang-java linenums">package io.deadline4j.opentelemetry;
+
+import io.deadline4j.Deadline;
+import io.deadline4j.DeadlineContext;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.ContextKey;
+import io.opentelemetry.context.propagation.TextMapGetter;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.context.propagation.TextMapSetter;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Propagates deadline as OTel baggage across process boundaries.
+ *
+ * &lt;p&gt;Baggage keys:
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@code deadline-remaining-ms} — remaining time in milliseconds&lt;/li&gt;
+ *   &lt;li&gt;{@code deadline-id} — correlation ID&lt;/li&gt;
+ * &lt;/ul&gt;
+ */
+<span class="fc" id="L25">public class DeadlineTextMapPropagator implements TextMapPropagator {</span>
+
+    static final String BAGGAGE_REMAINING = &quot;deadline-remaining-ms&quot;;
+    static final String BAGGAGE_ID = &quot;deadline-id&quot;;
+<span class="fc" id="L29">    static final ContextKey&lt;Deadline&gt; DEADLINE_CONTEXT_KEY =</span>
+<span class="fc" id="L30">        ContextKey.named(&quot;deadline4j.deadline&quot;);</span>
+
+<span class="fc" id="L32">    private static final List&lt;String&gt; FIELDS =</span>
+<span class="fc" id="L33">        Collections.unmodifiableList(Arrays.asList(BAGGAGE_REMAINING, BAGGAGE_ID));</span>
+
+    @Override
+    public Collection&lt;String&gt; fields() {
+<span class="fc" id="L37">        return FIELDS;</span>
+    }
+
+    @Override
+    public &lt;C&gt; void inject(Context context, C carrier, TextMapSetter&lt;C&gt; setter) {
+        // Read from OTel context first, then fall back to DeadlineContext
+<span class="fc" id="L43">        Deadline deadline = context.get(DEADLINE_CONTEXT_KEY);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (deadline == null) {</span>
+<span class="fc" id="L45">            deadline = DeadlineContext.capture();</span>
+        }
+<span class="pc bpc" id="L47" title="2 of 6 branches missed.">        if (deadline == null || carrier == null || setter == null) return;</span>
+
+<span class="fc" id="L49">        setter.set(carrier, BAGGAGE_REMAINING, String.valueOf(deadline.remainingMillis()));</span>
+<span class="fc" id="L50">        deadline.id().ifPresent(id -&gt; setter.set(carrier, BAGGAGE_ID, id));</span>
+<span class="fc" id="L51">    }</span>
+
+    @Override
+    public &lt;C&gt; Context extract(Context context, C carrier, TextMapGetter&lt;C&gt; getter) {
+<span class="pc bpc" id="L55" title="2 of 4 branches missed.">        if (carrier == null || getter == null) return context;</span>
+
+<span class="fc" id="L57">        String raw = getter.get(carrier, BAGGAGE_REMAINING);</span>
+<span class="pc bpc" id="L58" title="1 of 4 branches missed.">        if (raw == null || raw.isEmpty()) return context;</span>
+
+        try {
+<span class="fc" id="L61">            long remainingMs = Long.parseLong(raw);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (remainingMs &lt;= 0) return context;</span>
+
+<span class="fc" id="L64">            String id = getter.get(carrier, BAGGAGE_ID);</span>
+<span class="fc" id="L65">            Deadline deadline = Deadline.fromRemainingMillis(remainingMs, id);</span>
+<span class="fc" id="L66">            return context.with(DEADLINE_CONTEXT_KEY, deadline);</span>
+<span class="fc" id="L67">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L68">            return context;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

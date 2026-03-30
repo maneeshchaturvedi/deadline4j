@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdaptiveTimeoutRegistry.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">AdaptiveTimeoutRegistry.java</span></div><h1>AdaptiveTimeoutRegistry.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Registry of {@link AdaptiveTimeout} instances, keyed by service name.
+ *
+ * &lt;p&gt;Thread-safe. Uses {@link ConcurrentHashMap#computeIfAbsent} to ensure
+ * each service name maps to exactly one {@link AdaptiveTimeout} instance.
+ *
+ * &lt;p&gt;If the {@link DynamicConfigSource} throws when resolving config,
+ * a default configuration is used as fallback.
+ */
+public final class AdaptiveTimeoutRegistry {
+
+<span class="fc" id="L18">    private static final Logger LOG = Logger.getLogger(AdaptiveTimeoutRegistry.class.getName());</span>
+
+<span class="fc" id="L20">    private final ConcurrentHashMap&lt;String, AdaptiveTimeout&gt; timeouts = new ConcurrentHashMap&lt;&gt;();</span>
+    private final DynamicConfigSource configSource;
+
+    /**
+     * Creates a registry backed by the given config source.
+     *
+     * @param configSource source for per-service adaptive timeout configuration
+     */
+<span class="fc" id="L28">    public AdaptiveTimeoutRegistry(DynamicConfigSource configSource) {</span>
+<span class="fc" id="L29">        this.configSource = configSource;</span>
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * Returns the {@link AdaptiveTimeout} for the given service, creating it
+     * on first access. Subsequent calls return the cached instance.
+     *
+     * &lt;p&gt;If the config source throws, a default configuration is used.
+     *
+     * @param name the service name
+     * @return the adaptive timeout for that service
+     */
+    public AdaptiveTimeout forService(String name) {
+<span class="fc" id="L42">        return timeouts.computeIfAbsent(name, this::createTimeout);</span>
+    }
+
+    /**
+     * Reloads configuration for the named service by replacing its
+     * {@link AdaptiveTimeout} with a freshly configured instance.
+     *
+     * &lt;p&gt;No-op if the service is not already registered.
+     *
+     * @param serviceName the service whose config should be reloaded
+     */
+    public void reloadConfig(String serviceName) {
+<span class="fc" id="L54">        timeouts.computeIfPresent(serviceName, (key, old) -&gt; createTimeout(key));</span>
+<span class="fc" id="L55">    }</span>
+
+    private AdaptiveTimeout createTimeout(String name) {
+        AdaptiveTimeoutConfig config;
+        try {
+<span class="fc" id="L60">            config = configSource.resolve(name);</span>
+<span class="fc" id="L61">        } catch (Exception e) {</span>
+<span class="fc" id="L62">            LOG.log(Level.WARNING,</span>
+                    &quot;Failed to resolve config for service '&quot; + name
+                            + &quot;', falling back to defaults&quot;, e);
+<span class="fc" id="L65">            config = AdaptiveTimeoutConfig.builder().build();</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">        return new AdaptiveTimeout(name, config);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

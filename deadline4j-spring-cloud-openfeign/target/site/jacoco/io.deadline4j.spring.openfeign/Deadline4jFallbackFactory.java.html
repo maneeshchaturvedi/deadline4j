@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Deadline4jFallbackFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-spring-cloud-openfeign</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.spring.openfeign</a> &gt; <span class="el_source">Deadline4jFallbackFactory.java</span></div><h1>Deadline4jFallbackFactory.java</h1><pre class="source lang-java linenums">package io.deadline4j.spring.openfeign;
+
+import io.deadline4j.DeadlineExceededException;
+
+import java.lang.reflect.Proxy;
+
+/**
+ * Fallback factory for Feign clients. When a call is skipped due to
+ * deadline exceeded or optional call degradation, returns a proxy
+ * that produces sensible default values.
+ *
+ * @param &lt;T&gt; the Feign client interface type
+ */
+public class Deadline4jFallbackFactory&lt;T&gt; {
+
+    private final Class&lt;T&gt; clientType;
+
+<span class="fc" id="L18">    public Deadline4jFallbackFactory(Class&lt;T&gt; clientType) {</span>
+<span class="fc" id="L19">        this.clientType = clientType;</span>
+<span class="fc" id="L20">    }</span>
+
+    /**
+     * Create a fallback instance for the given cause.
+     * If the cause is a {@link DeadlineExceededException} (or subclass such as
+     * {@link io.deadline4j.OptionalCallSkippedException}),
+     * returns a proxy with default return values.
+     * Otherwise rethrows.
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public T create(Throwable cause) {
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if (cause instanceof DeadlineExceededException) {</span>
+<span class="fc" id="L32">            return (T) Proxy.newProxyInstance(</span>
+<span class="fc" id="L33">                clientType.getClassLoader(),</span>
+                new Class[]{clientType},
+<span class="fc" id="L35">                (proxy, method, args) -&gt; DefaultReturnValues.forType(</span>
+<span class="fc" id="L36">                    method.getReturnType()));</span>
+        }
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (cause instanceof RuntimeException) throw (RuntimeException) cause;</span>
+<span class="fc" id="L39">        throw new RuntimeException(cause);</span>
+    }
+
+    /** Returns the Feign client interface type this factory handles. */
+    public Class&lt;T&gt; clientType() {
+<span class="fc" id="L44">        return clientType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

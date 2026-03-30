@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RemainingMillisCodec.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">RemainingMillisCodec.java</span></div><h1>RemainingMillisCodec.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+/**
+ * Default {@link DeadlineCodec} implementation that serializes deadlines
+ * using remaining milliseconds.
+ *
+ * &lt;p&gt;Uses two headers:
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@code X-Deadline-Remaining-Ms} — remaining time in milliseconds (required)&lt;/li&gt;
+ *   &lt;li&gt;{@code X-Deadline-Id} — correlation ID (optional)&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;Package-private — obtain via {@link DeadlineCodec#remainingMillis()}.
+ */
+<span class="fc" id="L15">final class RemainingMillisCodec implements DeadlineCodec {</span>
+
+    static final String HEADER_REMAINING_MS = &quot;X-Deadline-Remaining-Ms&quot;;
+    static final String HEADER_DEADLINE_ID = &quot;X-Deadline-Id&quot;;
+
+    @Override
+    public &lt;C&gt; void inject(Deadline deadline, C carrier, CarrierSetter&lt;C&gt; setter) {
+<span class="fc" id="L22">        setter.set(carrier, HEADER_REMAINING_MS, String.valueOf(deadline.remainingMillis()));</span>
+<span class="fc" id="L23">        deadline.id().ifPresent(id -&gt; setter.set(carrier, HEADER_DEADLINE_ID, id));</span>
+<span class="fc" id="L24">    }</span>
+
+    @Override
+    public &lt;C&gt; Deadline extract(C carrier, CarrierGetter&lt;C&gt; getter) {
+<span class="fc" id="L28">        String remainingStr = getter.get(carrier, HEADER_REMAINING_MS);</span>
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        if (remainingStr == null || remainingStr.isEmpty()) {</span>
+<span class="fc" id="L30">            return null;</span>
+        }
+
+        long remainingMs;
+        try {
+<span class="fc" id="L35">            remainingMs = Long.parseLong(remainingStr);</span>
+<span class="fc" id="L36">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L37">            return null;</span>
+<span class="fc" id="L38">        }</span>
+
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (remainingMs &lt;= 0) {</span>
+<span class="fc" id="L41">            return null;</span>
+        }
+
+<span class="fc" id="L44">        String id = getter.get(carrier, HEADER_DEADLINE_ID);</span>
+<span class="fc" id="L45">        return Deadline.fromRemainingMillis(remainingMs, id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceConfigRegistry.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">ServiceConfigRegistry.java</span></div><h1>ServiceConfigRegistry.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+/**
+ * Registry that resolves {@link ServiceConfig} for downstream services.
+ *
+ * &lt;p&gt;Delegates to a {@link DynamicServiceConfigSource} for the actual resolution.
+ */
+public final class ServiceConfigRegistry {
+
+    private final DynamicServiceConfigSource configSource;
+
+    /**
+     * Creates a registry backed by the given config source.
+     *
+     * @param configSource source for per-service configuration
+     */
+<span class="fc" id="L17">    public ServiceConfigRegistry(DynamicServiceConfigSource configSource) {</span>
+<span class="fc" id="L18">        this.configSource = configSource;</span>
+<span class="fc" id="L19">    }</span>
+
+    /**
+     * Returns the {@link ServiceConfig} for the named service.
+     *
+     * @param serviceName the downstream service name
+     * @return configuration for that service
+     */
+    public ServiceConfig forService(String serviceName) {
+<span class="fc" id="L28">        return configSource.resolve(serviceName);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultReturnValues.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-spring-cloud-openfeign</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.spring.openfeign</a> &gt; <span class="el_source">DefaultReturnValues.java</span></div><h1>DefaultReturnValues.java</h1><pre class="source lang-java linenums">package io.deadline4j.spring.openfeign;
+
+import java.util.*;
+
+/**
+ * Computes sensible default return values by type.
+ * Used by fallback factory when optional calls are skipped.
+ */
+final class DefaultReturnValues {
+
+    private DefaultReturnValues() {}
+
+    static Object forType(Class&lt;?&gt; type) {
+<span class="fc bfc" id="L14" title="All 4 branches covered.">        if (type == void.class || type == Void.class) return null;</span>
+<span class="fc bfc" id="L15" title="All 2 branches covered.">        if (type == Optional.class) return Optional.empty();</span>
+<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (List.class.isAssignableFrom(type)) return Collections.emptyList();</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (Set.class.isAssignableFrom(type)) return Collections.emptySet();</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if (Map.class.isAssignableFrom(type)) return Collections.emptyMap();</span>
+<span class="fc bfc" id="L19" title="All 4 branches covered.">        if (type == boolean.class || type == Boolean.class) return false;</span>
+<span class="fc bfc" id="L20" title="All 4 branches covered.">        if (type == int.class || type == Integer.class) return 0;</span>
+<span class="fc bfc" id="L21" title="All 4 branches covered.">        if (type == long.class || type == Long.class) return 0L;</span>
+<span class="fc bfc" id="L22" title="All 4 branches covered.">        if (type == double.class || type == Double.class) return 0.0;</span>
+<span class="fc bfc" id="L23" title="All 4 branches covered.">        if (type == float.class || type == Float.class) return 0.0f;</span>
+<span class="pc bpc" id="L24" title="1 of 4 branches missed.">        if (type == short.class || type == Short.class) return (short) 0;</span>
+<span class="pc bpc" id="L25" title="1 of 4 branches missed.">        if (type == byte.class || type == Byte.class) return (byte) 0;</span>
+<span class="pc bpc" id="L26" title="1 of 4 branches missed.">        if (type == char.class || type == Character.class) return '\0';</span>
+<span class="fc" id="L27">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

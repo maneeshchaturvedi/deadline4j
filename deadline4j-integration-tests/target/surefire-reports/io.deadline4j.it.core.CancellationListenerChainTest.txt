@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.deadline4j.it.core.CancellationListenerChainTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.336 s -- in io.deadline4j.it.core.CancellationListenerChainTest

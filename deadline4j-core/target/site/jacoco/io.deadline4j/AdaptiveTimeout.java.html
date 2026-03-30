@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdaptiveTimeout.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">AdaptiveTimeout.java</span></div><h1>AdaptiveTimeout.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+import java.time.Duration;
+
+/**
+ * Computes dynamic timeouts based on observed latency distributions.
+ *
+ * &lt;p&gt;Backed by a sliding-window HdrHistogram. The timeout is set at a
+ * configurable percentile of observed latencies, multiplied by a
+ * headroom factor, and clamped to absolute bounds.
+ *
+ * &lt;p&gt;Thread-safe. One instance per downstream service, shared across
+ * all request threads.
+ */
+public final class AdaptiveTimeout {
+
+    private final String name;
+    private final AdaptiveTimeoutConfig config;
+    private final SlidingWindowHistogram histogram;
+
+    /**
+     * Creates a new adaptive timeout tracker.
+     * Package-private: instances are created by {@code AdaptiveTimeoutRegistry}.
+     */
+<span class="fc" id="L25">    AdaptiveTimeout(String name, AdaptiveTimeoutConfig config) {</span>
+<span class="fc" id="L26">        this.name = name;</span>
+<span class="fc" id="L27">        this.config = config;</span>
+<span class="fc" id="L28">        this.histogram = new SlidingWindowHistogram(</span>
+<span class="fc" id="L29">                config.windowSize().toNanos(),</span>
+<span class="fc" id="L30">                config.maxTimeout().toMillis() * 2  // track beyond max for distribution visibility</span>
+        );
+<span class="fc" id="L32">    }</span>
+
+    /** Record an observed latency. Called by interceptors, not application code. */
+    public void recordLatency(Duration latency) {
+<span class="fc" id="L36">        histogram.recordValue(latency.toMillis());</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * Current adaptive timeout value.
+     *
+     * &lt;p&gt;During cold start (fewer than {@code minSamples} observations),
+     * returns {@code coldStartTimeout}.
+     *
+     * &lt;p&gt;After warm-up: percentile x headroomMultiplier, clamped to
+     * [minTimeout, maxTimeout].
+     */
+    public Duration currentTimeout() {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (histogram.totalCount() &lt; config.minSamples()) {</span>
+<span class="fc" id="L50">            return config.coldStartTimeout();</span>
+        }
+<span class="fc" id="L52">        long percentileMs = histogram.getValueAtPercentile(</span>
+<span class="fc" id="L53">                config.percentile() * 100.0);</span>
+<span class="fc" id="L54">        long withHeadroom = (long) (percentileMs * config.headroomMultiplier());</span>
+<span class="fc" id="L55">        long clamped = Math.max(config.minTimeout().toMillis(),</span>
+<span class="fc" id="L56">                Math.min(withHeadroom, config.maxTimeout().toMillis()));</span>
+<span class="fc" id="L57">        return Duration.ofMillis(clamped);</span>
+    }
+
+    /**
+     * Effective timeout: min(adaptive timeout, remaining deadline).
+     * This is what interceptors use. Mirrors gRPC's
+     * effectiveDeadline = min(callOptions.deadline, context.deadline).
+     */
+    public Duration effectiveTimeout(Deadline deadline) {
+<span class="fc" id="L66">        Duration adaptive = currentTimeout();</span>
+<span class="fc" id="L67">        Duration remaining = deadline.remaining();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        return remaining.compareTo(adaptive) &lt; 0 ? remaining : adaptive;</span>
+    }
+
+    /** Raw percentile value in millis (before headroom). For observability. */
+    public long currentPercentileMillis() {
+<span class="fc" id="L73">        return histogram.getValueAtPercentile(config.percentile() * 100.0);</span>
+    }
+
+    /** Number of samples recorded. */
+    public long sampleCount() {
+<span class="fc" id="L78">        return histogram.totalCount();</span>
+    }
+
+    /** Name of this adaptive timeout (typically the downstream service name). */
+    public String name() {
+<span class="fc" id="L83">        return name;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,3 @@
+io/deadline4j/spring/openfeign/Deadline4jFallbackFactory.class
+io/deadline4j/spring/openfeign/DefaultReturnValues.class
+io/deadline4j/spring/openfeign/DeadlineFeignInterceptor.class

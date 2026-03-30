@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeadlineExceededException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">DeadlineExceededException.java</span></div><h1>DeadlineExceededException.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+/**
+ * Thrown when a deadline has expired before or during a downstream call.
+ * Extends RuntimeException — recoverable, services should catch for
+ * fallback logic (or let the framework handle it).
+ */
+public class DeadlineExceededException extends RuntimeException {
+
+    private final String serviceName;
+    private final long budgetRemainingMs;
+
+    public DeadlineExceededException(String message) {
+<span class="fc" id="L14">        this(message, null, -1);</span>
+<span class="fc" id="L15">    }</span>
+
+    public DeadlineExceededException(String message, String serviceName,
+                                      long budgetRemainingMs) {
+<span class="fc" id="L19">        super(message);</span>
+<span class="fc" id="L20">        this.serviceName = serviceName;</span>
+<span class="fc" id="L21">        this.budgetRemainingMs = budgetRemainingMs;</span>
+<span class="fc" id="L22">    }</span>
+
+    /** Name of the service that was being called, or null. */
+    public String serviceName() {
+<span class="fc" id="L26">        return serviceName;</span>
+    }
+
+    /** Budget remaining in ms at the time of the exception, or -1 if unknown. */
+    public long budgetRemainingMs() {
+<span class="fc" id="L31">        return budgetRemainingMs;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

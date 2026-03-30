@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.deadline4j.spring.autoconfigure.Deadline4jPropertiesTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.148 s -- in io.deadline4j.spring.autoconfigure.Deadline4jPropertiesTest

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeadlineContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-core</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j</a> &gt; <span class="el_source">DeadlineContext.java</span></div><h1>DeadlineContext.java</h1><pre class="source lang-java linenums">package io.deadline4j;
+
+import java.time.Duration;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
+/**
+ * Stores and retrieves the {@link Deadline} for the current request.
+ *
+ * &lt;p&gt;Storage is pluggable via {@link DeadlineContextStorage}. The
+ * default is ThreadLocal-based. Reactive integrations bridge to
+ * Reactor's Context. Vert.x integrations bridge to Vert.x local context.
+ *
+ * &lt;p&gt;This class is the primary entry point for application code that
+ * needs to check remaining time (rare — most code never touches this).
+ */
+public final class DeadlineContext {
+
+<span class="fc" id="L20">    private static volatile DeadlineContextStorage storage =</span>
+<span class="fc" id="L21">            DeadlineContextStorage.threadLocal();</span>
+
+    private DeadlineContext() {}
+
+    /** Override the storage strategy. Call once at startup. */
+    public static void setStorage(DeadlineContextStorage storageImpl) {
+<span class="fc" id="L27">        Objects.requireNonNull(storageImpl, &quot;storageImpl&quot;);</span>
+<span class="fc" id="L28">        storage = storageImpl;</span>
+<span class="fc" id="L29">    }</span>
+
+    /** Get the current deadline, if one is set. */
+    public static Optional&lt;Deadline&gt; current() {
+<span class="fc" id="L33">        return Optional.ofNullable(storage.current());</span>
+    }
+
+    /**
+     * Get remaining duration. Returns {@code defaultValue} if no
+     * deadline is set.
+     */
+    public static Duration remaining(Duration defaultValue) {
+<span class="fc" id="L41">        Deadline d = storage.current();</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        return d != null ? d.remaining() : defaultValue;</span>
+    }
+
+    /** True if a deadline is set and has expired. */
+    public static boolean isExpired() {
+<span class="fc" id="L47">        Deadline d = storage.current();</span>
+<span class="fc bfc" id="L48" title="All 4 branches covered.">        return d != null &amp;&amp; d.isExpired();</span>
+    }
+
+    /**
+     * Attach a deadline. Returns a {@link Scope} for try-with-resources.
+     * Framework code (filters, interceptors) calls this.
+     * Application code generally should not.
+     */
+    public static Scope attach(Deadline deadline) {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (deadline == null) {</span>
+<span class="fc" id="L58">            throw new NullPointerException(&quot;deadline&quot;);</span>
+        }
+<span class="fc" id="L60">        return storage.attach(deadline);</span>
+    }
+
+    /**
+     * Clear the current deadline. Returns a Scope that restores the
+     * previous deadline on close. Used by test utilities.
+     */
+    public static Scope clear() {
+<span class="fc" id="L68">        return storage.clear();</span>
+    }
+
+    /** Capture the current deadline for propagation to another thread. */
+    public static Deadline capture() {
+<span class="fc" id="L73">        return storage.current();</span>
+    }
+
+    /**
+     * Wraps a Runnable to capture the current deadline and restore it
+     * during execution. The gRPC Context.wrap() equivalent.
+     */
+    public static Runnable wrapRunnable(Runnable task) {
+<span class="fc" id="L81">        Deadline captured = capture();</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (captured == null) return task;</span>
+<span class="fc" id="L83">        return () -&gt; {</span>
+<span class="fc" id="L84">            try (Scope s = attach(captured)) {</span>
+<span class="fc" id="L85">                task.run();</span>
+            }
+<span class="fc" id="L87">        };</span>
+    }
+
+    /**
+     * Wraps a Callable to capture the current deadline and restore it
+     * during execution.
+     */
+    public static &lt;V&gt; Callable&lt;V&gt; wrapCallable(Callable&lt;V&gt; task) {
+<span class="fc" id="L95">        Deadline captured = capture();</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (captured == null) return task;</span>
+<span class="fc" id="L97">        return () -&gt; {</span>
+<span class="fc" id="L98">            try (Scope s = attach(captured)) {</span>
+<span class="fc" id="L99">                return task.call();</span>
+            }
+        };
+    }
+
+    /**
+     * A closeable scope that restores the previous deadline on close.
+     * Designed for use with try-with-resources.
+     */
+    @FunctionalInterface
+    public interface Scope extends AutoCloseable {
+        @Override
+        void close(); // no checked exception
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

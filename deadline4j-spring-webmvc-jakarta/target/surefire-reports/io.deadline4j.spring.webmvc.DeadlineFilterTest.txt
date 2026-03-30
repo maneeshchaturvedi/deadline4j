@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.deadline4j.spring.webmvc.DeadlineFilterTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.140 s -- in io.deadline4j.spring.webmvc.DeadlineFilterTest

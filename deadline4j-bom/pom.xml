@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.deadline4j</groupId>
+    <artifactId>deadline4j-bom</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>deadline4j-bom</name>
+    <description>Bill of Materials for deadline4j — import this to align all module versions</description>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Core -->
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Spring integrations -->
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-spring-webmvc-jakarta</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-spring-webflux</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-spring-cloud-openfeign</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Observability -->
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-micrometer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-opentelemetry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Optional timer adapters -->
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-timer-netty</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.deadline4j</groupId>
+                <artifactId>deadline4j-timer-agrona</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -1,0 +1,4 @@
+io/deadline4j/spring/openfeign/Deadline4jFallbackFactoryTest$TestClient.class
+io/deadline4j/spring/openfeign/DefaultReturnValuesTest.class
+io/deadline4j/spring/openfeign/DeadlineFeignInterceptorTest.class
+io/deadline4j/spring/openfeign/Deadline4jFallbackFactoryTest.class

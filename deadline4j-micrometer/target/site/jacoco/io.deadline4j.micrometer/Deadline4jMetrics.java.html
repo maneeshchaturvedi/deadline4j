@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Deadline4jMetrics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-micrometer</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.micrometer</a> &gt; <span class="el_source">Deadline4jMetrics.java</span></div><h1>Deadline4jMetrics.java</h1><pre class="source lang-java linenums">package io.deadline4j.micrometer;
+
+import io.micrometer.core.instrument.*;
+import java.time.Duration;
+import java.util.function.Supplier;
+
+/**
+ * Records deadline4j metrics via Micrometer.
+ * All metrics are created lazily on first use.
+ */
+public class Deadline4jMetrics {
+
+    private final MeterRegistry registry;
+
+<span class="fc" id="L15">    public Deadline4jMetrics(MeterRegistry registry) {</span>
+<span class="fc" id="L16">        this.registry = registry;</span>
+<span class="fc" id="L17">    }</span>
+
+    /** Record duration of a downstream call. */
+    public void recordCallDuration(String service, String outcome, Duration duration) {
+<span class="fc" id="L21">        Timer.builder(&quot;deadline4j.call.duration&quot;)</span>
+<span class="fc" id="L22">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L23">            .tag(&quot;outcome&quot;, outcome)</span>
+<span class="fc" id="L24">            .register(registry)</span>
+<span class="fc" id="L25">            .record(duration);</span>
+<span class="fc" id="L26">    }</span>
+
+    /** Register a gauge for the current adaptive timeout of a service. */
+    public void registerAdaptiveTimeoutGauge(String service, Supplier&lt;Number&gt; valueSupplier) {
+<span class="fc" id="L30">        Gauge.builder(&quot;deadline4j.adaptive.timeout.ms&quot;, valueSupplier)</span>
+<span class="fc" id="L31">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L32">            .register(registry);</span>
+<span class="fc" id="L33">    }</span>
+
+    /** Register a gauge for the raw percentile value (before headroom). */
+    public void registerAdaptivePercentileGauge(String service, Supplier&lt;Number&gt; valueSupplier) {
+<span class="fc" id="L37">        Gauge.builder(&quot;deadline4j.adaptive.percentile.ms&quot;, valueSupplier)</span>
+<span class="fc" id="L38">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L39">            .register(registry);</span>
+<span class="fc" id="L40">    }</span>
+
+    /** Record fraction of budget consumed when request completes. */
+    public void recordBudgetConsumedRatio(double ratio) {
+<span class="fc" id="L44">        DistributionSummary.builder(&quot;deadline4j.budget.consumed.ratio&quot;)</span>
+<span class="fc" id="L45">            .register(registry)</span>
+<span class="fc" id="L46">            .record(ratio);</span>
+<span class="fc" id="L47">    }</span>
+
+    /** Record a deadline exceeded event. */
+    public void recordDeadlineExceeded(String service, String phase, String mode) {
+<span class="fc" id="L51">        Counter.builder(&quot;deadline4j.deadline.exceeded&quot;)</span>
+<span class="fc" id="L52">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L53">            .tag(&quot;phase&quot;, phase)</span>
+<span class="fc" id="L54">            .tag(&quot;mode&quot;, mode)</span>
+<span class="fc" id="L55">            .register(registry)</span>
+<span class="fc" id="L56">            .increment();</span>
+<span class="fc" id="L57">    }</span>
+
+    /** Record an optional call being skipped. */
+    public void recordCallSkipped(String service) {
+<span class="fc" id="L61">        Counter.builder(&quot;deadline4j.call.skipped&quot;)</span>
+<span class="fc" id="L62">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L63">            .register(registry)</span>
+<span class="fc" id="L64">            .increment();</span>
+<span class="fc" id="L65">    }</span>
+
+    /** Record remaining budget when a downstream call starts. */
+    public void recordRemainingAtCall(String service, long remainingMs) {
+<span class="fc" id="L69">        DistributionSummary.builder(&quot;deadline4j.remaining.at_call.ms&quot;)</span>
+<span class="fc" id="L70">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L71">            .register(registry)</span>
+<span class="fc" id="L72">            .record(remainingMs);</span>
+<span class="fc" id="L73">    }</span>
+
+    /** Record a circuit breaker activation due to high error rate. */
+    public void recordCircuitOpen(String service) {
+<span class="fc" id="L77">        Counter.builder(&quot;deadline4j.safety.circuit_open&quot;)</span>
+<span class="fc" id="L78">            .tag(&quot;service&quot;, service)</span>
+<span class="fc" id="L79">            .register(registry)</span>
+<span class="fc" id="L80">            .increment();</span>
+<span class="fc" id="L81">    }</span>
+
+    public MeterRegistry registry() {
+<span class="fc" id="L84">        return registry;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

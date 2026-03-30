@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NettyHashedWheelTimerAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">deadline4j-timer-netty</a> &gt; <a href="index.source.html" class="el_package">io.deadline4j.timer.netty</a> &gt; <span class="el_source">NettyHashedWheelTimerAdapter.java</span></div><h1>NettyHashedWheelTimerAdapter.java</h1><pre class="source lang-java linenums">package io.deadline4j.timer.netty;
+
+import io.deadline4j.DeadlineTimer;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Adapts Netty's {@link HashedWheelTimer} to the {@link DeadlineTimer} SPI.
+ * O(1) scheduling, suitable for 100K+ concurrent deadlines.
+ */
+public class NettyHashedWheelTimerAdapter implements DeadlineTimer {
+
+    private final HashedWheelTimer timer;
+
+    /** Create with default settings (100ms tick, 512 slots, daemon thread). */
+    public NettyHashedWheelTimerAdapter() {
+<span class="fc" id="L19">        this(new HashedWheelTimer(</span>
+            r -&gt; {
+<span class="fc" id="L21">                Thread t = new Thread(r, &quot;deadline4j-netty-timer&quot;);</span>
+<span class="fc" id="L22">                t.setDaemon(true);</span>
+<span class="fc" id="L23">                return t;</span>
+            },
+            100, TimeUnit.MILLISECONDS, 512));
+<span class="fc" id="L26">    }</span>
+
+    /** Create wrapping an existing HashedWheelTimer. */
+<span class="fc" id="L29">    public NettyHashedWheelTimerAdapter(HashedWheelTimer timer) {</span>
+<span class="fc" id="L30">        this.timer = timer;</span>
+<span class="fc" id="L31">        this.timer.start();</span>
+<span class="fc" id="L32">    }</span>
+
+    @Override
+    public TimerHandle schedule(Runnable task, long delay, TimeUnit unit) {
+<span class="fc" id="L36">        Timeout timeout = timer.newTimeout(t -&gt; task.run(), delay, unit);</span>
+<span class="fc" id="L37">        return () -&gt; timeout.cancel();</span>
+    }
+
+    @Override
+    public void shutdown() {
+<span class="fc" id="L42">        timer.stop();</span>
+<span class="fc" id="L43">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
