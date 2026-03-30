@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.deadline4j.timer.agrona.AgronaDeadlineTimerAdapterTest
--------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.494 s -- in io.deadline4j.timer.agrona.AgronaDeadlineTimerAdapterTest

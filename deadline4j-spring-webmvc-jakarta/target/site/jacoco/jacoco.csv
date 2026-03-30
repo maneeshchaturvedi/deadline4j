@@ -1,5 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-deadline4j-spring-webmvc-jakarta,io.deadline4j.spring.webmvc,DeadlineExceptionHandler,0,38,0,2,0,8,0,3,0,2
-deadline4j-spring-webmvc-jakarta,io.deadline4j.spring.webmvc,EmptyClientHttpResponse,1,29,0,0,1,9,1,7,1,7
-deadline4j-spring-webmvc-jakarta,io.deadline4j.spring.webmvc,DeadlineFilter,0,68,0,8,0,22,0,7,0,3
-deadline4j-spring-webmvc-jakarta,io.deadline4j.spring.webmvc,DeadlineRestTemplateInterceptor,0,169,3,17,0,41,3,11,0,4

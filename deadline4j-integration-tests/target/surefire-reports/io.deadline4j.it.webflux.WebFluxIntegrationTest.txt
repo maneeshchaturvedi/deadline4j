@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.deadline4j.it.webflux.WebFluxIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.044 s -- in io.deadline4j.it.webflux.WebFluxIntegrationTest

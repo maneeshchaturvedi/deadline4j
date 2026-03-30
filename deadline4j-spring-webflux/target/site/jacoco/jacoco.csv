@@ -1,4 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-deadline4j-spring-webflux,io.deadline4j.spring.webflux,DeadlineWebFilter,0,66,0,8,0,19,0,9,0,5
-deadline4j-spring-webflux,io.deadline4j.spring.webflux,DeadlineWebClientFilter,0,135,3,13,0,33,3,10,0,5
-deadline4j-spring-webflux,io.deadline4j.spring.webflux,ReactorDeadlineBridge,0,11,0,0,0,2,0,2,0,2

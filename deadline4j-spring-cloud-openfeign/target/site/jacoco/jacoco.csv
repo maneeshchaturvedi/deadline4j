@@ -1,4 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-deadline4j-spring-cloud-openfeign,io.deadline4j.spring.openfeign,DefaultReturnValues,0,105,3,41,0,14,3,20,0,1
-deadline4j-spring-cloud-openfeign,io.deadline4j.spring.openfeign,DeadlineFeignInterceptor,0,127,3,17,0,28,3,10,0,3
-deadline4j-spring-cloud-openfeign,io.deadline4j.spring.openfeign,Deadline4jFallbackFactory,0,40,0,4,0,11,0,6,0,4

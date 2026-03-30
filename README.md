@@ -2,7 +2,7 @@
 
 **Zero-code deadline propagation, adaptive timeouts, and timeout budgets for Spring applications.**
 
-*Java 11+ &middot; Spring Boot 3.x &middot; Micrometer &middot; OpenTelemetry*
+_Java 11+ &middot; Spring Boot 3.x &middot; Micrometer &middot; OpenTelemetry_
 
 ---
 
@@ -29,11 +29,12 @@ Add configuration:
 
 ```yaml
 deadline4j:
-  enforcement: observe    # Safe default: track everything, enforce nothing
-  default-deadline: 10s   # Requests without a deadline header get 10s
+  enforcement: observe # Safe default: track everything, enforce nothing
+  default-deadline: 10s # Requests without a deadline header get 10s
 ```
 
 That's it. Your application now:
+
 - Extracts `X-Deadline-Remaining-Ms` from incoming requests
 - Propagates deadlines to all outbound RestTemplate, WebClient, and Feign calls
 - Tracks adaptive timeouts based on observed latency distributions
@@ -113,13 +114,13 @@ deadline4j:
 
   # Global adaptive timeout defaults
   adaptive:
-    percentile: 0.99           # P99 of observed latencies
-    min-timeout: 50ms          # Floor
-    max-timeout: 30s           # Ceiling
-    cold-start-timeout: 5s     # Used before enough samples collected
-    min-samples: 100           # Samples needed before switching to adaptive
-    window-size: 60s           # Sliding window duration
-    headroom-multiplier: 1.5   # Headroom above the percentile value
+    percentile: 0.99 # P99 of observed latencies
+    min-timeout: 50ms # Floor
+    max-timeout: 30s # Ceiling
+    cold-start-timeout: 5s # Used before enough samples collected
+    min-samples: 100 # Samples needed before switching to adaptive
+    window-size: 60s # Sliding window duration
+    headroom-multiplier: 1.5 # Headroom above the percentile value
 
   # Per-service overrides
   services:
@@ -142,17 +143,17 @@ deadline4j:
 
 ### Enforcement Modes
 
-| Mode | Behavior |
-|------|----------|
-| `observe` | Tracks metrics, propagates headers, never enforces. Safe for initial rollout. |
-| `enforce` | Full enforcement: timeouts applied, optional calls skipped, exceptions thrown. |
-| `disabled` | Complete passthrough. Library is invisible for this service. |
+| Mode       | Behavior                                                                       |
+| ---------- | ------------------------------------------------------------------------------ |
+| `observe`  | Tracks metrics, propagates headers, never enforces. Safe for initial rollout.  |
+| `enforce`  | Full enforcement: timeouts applied, optional calls skipped, exceptions thrown. |
+| `disabled` | Complete passthrough. Library is invisible for this service.                   |
 
 ### Service Priority
 
-| Priority | Behavior in `enforce` mode |
-|----------|---------------------------|
-| `required` | Always called. `DeadlineExceededException` thrown if deadline expired before call. |
+| Priority   | Behavior in `enforce` mode                                                                |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| `required` | Always called. `DeadlineExceededException` thrown if deadline expired before call.        |
 | `optional` | Skipped if remaining budget < `min-budget-required`. Application receives empty defaults. |
 
 ## Wire Protocol
@@ -192,20 +193,21 @@ public OrderResponse getOrder(@PathVariable String id) {
 
 ### Micrometer Metrics
 
-| Metric | Type | Tags |
-|--------|------|------|
-| `deadline4j.call.duration` | Timer | service, outcome |
-| `deadline4j.adaptive.timeout.ms` | Gauge | service |
-| `deadline4j.adaptive.percentile.ms` | Gauge | service |
-| `deadline4j.budget.consumed.ratio` | DistributionSummary | - |
-| `deadline4j.deadline.exceeded` | Counter | service, phase, mode |
-| `deadline4j.call.skipped` | Counter | service |
-| `deadline4j.remaining.at_call.ms` | DistributionSummary | service |
-| `deadline4j.safety.circuit_open` | Counter | service |
+| Metric                              | Type                | Tags                 |
+| ----------------------------------- | ------------------- | -------------------- |
+| `deadline4j.call.duration`          | Timer               | service, outcome     |
+| `deadline4j.adaptive.timeout.ms`    | Gauge               | service              |
+| `deadline4j.adaptive.percentile.ms` | Gauge               | service              |
+| `deadline4j.budget.consumed.ratio`  | DistributionSummary | -                    |
+| `deadline4j.deadline.exceeded`      | Counter             | service, phase, mode |
+| `deadline4j.call.skipped`           | Counter             | service              |
+| `deadline4j.remaining.at_call.ms`   | DistributionSummary | service              |
+| `deadline4j.safety.circuit_open`    | Counter             | service              |
 
 ### OpenTelemetry
 
 Span attributes set automatically:
+
 - `deadline4j.remaining_ms` (long) at span start
 - `deadline4j.budget_consumed` (double) at span end
 - `deadline4j.exceeded` (bool) at span end
@@ -236,4 +238,4 @@ Requires Java 17+ for Spring Boot 3.x modules. The core module targets Java 11.
 
 ## License
 
-TBD
+Licensed under the [Apache License, Version 2.0](LICENSE).

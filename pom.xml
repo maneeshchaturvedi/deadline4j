@@ -12,6 +12,34 @@
 
     <name>deadline4j</name>
     <description>Zero-code deadline propagation, adaptive timeouts, and timeout budgets</description>
+    <url>https://github.com/maneeshchaturvedi/deadline4j</url>
+    <inceptionYear>2025</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Maneesh Chaturvedi</name>
+            <url>https://github.com/maneeshchaturvedi</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/maneeshchaturvedi/deadline4j.git</connection>
+        <developerConnection>scm:git:git@github.com:maneeshchaturvedi/deadline4j.git</developerConnection>
+        <url>https://github.com/maneeshchaturvedi/deadline4j</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/maneeshchaturvedi/deadline4j/issues</url>
+    </issueManagement>
 
     <modules>
         <module>deadline4j-core</module>
